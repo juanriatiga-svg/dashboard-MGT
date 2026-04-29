@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MGT Magdalena — Dashboard Mantenimiento</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f1e;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --bg4: #1e2d45;
+  --card: #131d30;
+  --card2: #162035;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8edf5;
+  --text2: #8b97ad;
+  --text3: #4a5568;
+  --accent: #3b82f6;
+  --accent2: #60a5fa;
+  --teal: #14b8a6;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --violet: #8b5cf6;
+  --green: #22c55e;
+  --pend: #f59e0b;
+  --pend-bg: rgba(245,158,11,0.12);
+  --proc: #3b82f6;
+  --proc-bg: rgba(59,130,246,0.12);
+  --real: #22c55e;
+  --real-bg: rgba(34,197,94,0.12);
+  --alta: #f43f5e;
+  --alta-bg: rgba(244,63,94,0.12);
+  --media: #f59e0b;
+  --media-bg: rgba(245,158,11,0.10);
+  --baja: #22c55e;
+  --baja-bg: rgba(34,197,94,0.10);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --glow: 0 0 40px rgba(59,130,246,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRID BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── GLOW BLOBS ── */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+.blob-1 { width: 500px; height: 500px; background: rgba(59,130,246,0.07); top: -100px; left: -100px; }
+.blob-2 { width: 400px; height: 400px; background: rgba(139,92,246,0.06); bottom: 100px; right: -50px; }
+.blob-3 { width: 300px; height: 300px; background: rgba(20,184,166,0.05); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+/* ── LAYOUT ── */
+.shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+/* ── HEADER ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo-mark {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 600; color: #fff;
+  box-shadow: 0 0 20px rgba(59,130,246,0.35);
+  flex-shrink: 0;
+}
+header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+header p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.header-badge {
+  background: var(--proc-bg);
+  color: var(--accent2);
+  border: 1px solid rgba(59,130,246,0.2);
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 500;
+}
+
+/* ── KPI CARDS ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.kpi-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.kpi-card.total::before { background: linear-gradient(90deg, var(--accent), var(--violet)); }
+.kpi-card.pend::before { background: var(--pend); }
+.kpi-card.proc::before { background: var(--proc); }
+.kpi-card.real::before { background: var(--real); }
+.kpi-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-bottom: 12px;
+}
+.kpi-card.total .kpi-icon { background: rgba(59,130,246,0.15); }
+.kpi-card.pend .kpi-icon { background: var(--pend-bg); }
+.kpi-card.proc .kpi-icon { background: var(--proc-bg); }
+.kpi-card.real .kpi-icon { background: var(--real-bg); }
+.kpi-label { font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.kpi-value { font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -1px; }
+.kpi-card.total .kpi-value { color: var(--accent2); }
+.kpi-card.pend .kpi-value { color: var(--pend); }
+.kpi-card.proc .kpi-value { color: var(--proc); }
+.kpi-card.real .kpi-value { color: var(--real); }
+.kpi-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+/* ── CHARTS ROW ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+@media(max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  overflow: hidden;
+}
+.chart-card h3 {
+  font-size: 12px; font-weight: 500; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.chart-card h3 span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* Donut */
+.donut-wrap { display: flex; align-items: center; gap: 20px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.donut-leg-item { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.donut-leg-label { color: var(--text2); flex: 1; }
+.donut-leg-val { font-weight: 600; font-family: 'DM Mono', monospace; font-size: 13px; }
+
+/* Horizontal bars */
+.hbar { display: flex; flex-direction: column; gap: 10px; }
+.hbar-item { display: flex; align-items: center; gap: 10px; }
+.hbar-label { font-size: 11px; color: var(--text2); min-width: 72px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hbar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.hbar-count { font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); min-width: 24px; }
+
+/* Dependency heatmap dots */
+.dep-grid { display: flex; flex-direction: column; gap: 8px; }
+.dep-row { display: flex; align-items: center; gap: 8px; }
+.dep-name { font-size: 11px; color: var(--text2); min-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dep-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+.dep-dot {
+  width: 10px; height: 10px; border-radius: 2px;
+  transition: opacity 0.2s;
+}
+.dep-total { font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text2); margin-left: auto; min-width: 24px; text-align: right; }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.search-wrap {
+  position: relative; flex: 1; min-width: 200px;
+}
+.search-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--text3); font-size: 14px; pointer-events: none;
+}
+.search-wrap input {
+  width: 100%; height: 38px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  padding: 0 12px 0 36px;
+  outline: none; transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap input::placeholder { color: var(--text3); }
+
+select {
+  height: 38px; padding: 0 32px 0 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  outline: none; cursor: pointer;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b97ad' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.2s;
+}
+select:focus { border-color: var(--accent); }
+select option { background: #1a2235; }
+
+.btn-new {
+  height: 38px; padding: 0 18px;
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+.btn-new:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.count-badge {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  padding: 0 12px; height: 38px; display: flex; align-items: center;
+  border-radius: var(--radius-sm); font-size: 12px; color: var(--text2);
+  white-space: nowrap; font-family: 'DM Mono', monospace;
+}
+
+/* ── TABLE ── */
+.tbl-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  overflow-x: auto;
+}
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+thead th {
+  background: var(--bg3);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 10px; font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.9px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+thead th:hover { color: var(--text); }
+tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+td {
+  padding: 11px 14px;
+  font-size: 12px;
+  color: var(--text);
+  vertical-align: middle;
+}
+.td-tienda { font-weight: 600; font-size: 11px; color: var(--text2); white-space: nowrap; }
+.td-desc { max-width: 240px; line-height: 1.4; color: var(--text); }
+.td-mono { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
+
+/* Pills */
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+  text-transform: uppercase; white-space: nowrap;
+}
+.pill-dot { width: 5px; height: 5px; border-radius: 50%; }
+.pill-pend { background: var(--pend-bg); color: var(--pend); }
+.pill-pend .pill-dot { background: var(--pend); }
+.pill-proc { background: var(--proc-bg); color: var(--accent2); }
+.pill-proc .pill-dot { background: var(--accent2); box-shadow: 0 0 6px var(--accent); animation: pulse 2s infinite; }
+.pill-real { background: var(--real-bg); color: var(--real); }
+.pill-real .pill-dot { background: var(--real); }
+.pill-alta { background: var(--alta-bg); color: var(--alta); }
+.pill-media { background: var(--media-bg); color: var(--media); }
+.pill-baja { background: var(--baja-bg); color: var(--baja); }
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 4px var(--accent); opacity: 1; }
+  50% { box-shadow: 0 0 10px var(--accent); opacity: 0.6; }
+}
+
+/* Progress bar */
+.prog-wrap { display: flex; align-items: center; gap: 8px; }
+.prog-track { width: 70px; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; }
+.prog-fill.c0 { background: var(--rose); }
+.prog-fill.c50 { background: var(--amber); }
+.prog-fill.c100 { background: var(--green); }
+.prog-pct { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); min-width: 30px; }
+
+/* Actions */
+.actions { display: flex; gap: 5px; }
+.act-btn {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 12px;
+  transition: all 0.15s; color: var(--text2);
+}
+.act-btn:hover { border-color: var(--border2); background: rgba(255,255,255,0.05); color: var(--text); }
+.act-btn.done { color: var(--real); border-color: rgba(34,197,94,0.3); }
+.act-btn.done:hover { background: var(--real-bg); }
+.act-btn.del { color: var(--rose); border-color: rgba(244,63,94,0.3); }
+.act-btn.del:hover { background: var(--alta-bg); }
+
+/* Empty */
+.empty {
+  padding: 48px 24px; text-align: center;
+  color: var(--text3); font-size: 14px;
+}
+
+/* ── MODAL ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  z-index: 1000; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text2); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-full { grid-column: 1 / -1; }
+.form-row label { display: block; font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 6px; }
+.form-row input, .form-row select, .form-row textarea {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+  padding: 9px 12px; outline: none; transition: border-color 0.2s;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--accent); }
+.form-row textarea { resize: vertical; min-height: 64px; }
+.form-row select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b97ad' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 30px; -webkit-appearance: none;
+}
+.form-row select option { background: #1a2235; }
+
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.btn-cancel {
+  padding: 9px 18px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text2); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-cancel:hover { border-color: var(--border2); color: var(--text); }
+.btn-save {
+  padding: 9px 22px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  border: none; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+  transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.9; }
+
+/* ── NOTIFICATION ── */
+.notif {
+  position: fixed; top: 24px; right: 24px; z-index: 2000;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 12px 18px;
+  font-size: 13px; color: var(--text);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  display: flex; align-items: center; gap: 10px;
+  transform: translateX(120%);
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  max-width: 300px;
+}
+.notif.show { transform: translateX(0); }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--real); flex-shrink: 0; }
+
+.btn-reset {
+  height: 38px; padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--border2); border-radius: var(--radius-sm);
+  color: var(--text2); font-family: 'DM Sans', sans-serif; font-size: 12px;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+}
+.btn-reset:hover { border-color: var(--rose); color: var(--rose); }
+
+/* storage indicator */
+.storage-bar {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--text3);
+  padding: 6px 0 18px;
+}
+.storage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--real); flex-shrink: 0; }
+
+/* ── DÍAS VENCIDOS BADGE ── */
+.dias-ok   { color: var(--real);  font-family:'DM Mono',monospace; font-size:11px; }
+.dias-warn { color: var(--amber); font-family:'DM Mono',monospace; font-size:11px; font-weight:600; }
+.dias-over { color: var(--rose);  font-family:'DM Mono',monospace; font-size:11px; font-weight:700; }
+.dias-badge {
+  display:inline-block; padding:2px 7px; border-radius:6px;
+  font-family:'DM Mono',monospace; font-size:11px; font-weight:600; white-space:nowrap;
+}
+.dias-badge.ok   { background:rgba(34,197,94,0.12);  color:var(--real); }
+.dias-badge.warn { background:rgba(245,158,11,0.14); color:var(--amber); }
+.dias-badge.over { background:rgba(244,63,94,0.14);  color:var(--rose); }
+.dias-badge.done { background:rgba(255,255,255,0.05);color:var(--text3); }
+
+/* ── SMT/SMR FILTER PILL ── */
+.smt-pill {
+  display:inline-block; padding:2px 8px; border-radius:999px;
+  font-size:10px; font-weight:600; letter-spacing:0.3px; white-space:nowrap;
+}
+.smt-pill.smt { background:rgba(139,92,246,0.15); color:#a78bfa; }
+.smt-pill.smr { background:rgba(20,184,166,0.15);  color:var(--teal); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="shell">
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="logo-mark">M</div>
+      <div>
+        <h1>MGT Magdalena</h1>
+        <p>Dashboard de Seguimiento · Mantenimiento</p>
+      </div>
+    </div>
+    <div class="header-badge" id="hdr-fecha"></div>
+  </header>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card total">
+      <div class="kpi-icon">🗂</div>
+      <div class="kpi-label">Total tareas</div>
+      <div class="kpi-value" id="k-total">0</div>
+      <div class="kpi-sub">registradas</div>
+    </div>
+    <div class="kpi-card pend">
+      <div class="kpi-icon">⏳</div>
+      <div class="kpi-label">Pendientes</div>
+      <div class="kpi-value" id="k-pend">0</div>
+      <div class="kpi-sub">sin iniciar</div>
+    </div>
+    <div class="kpi-card proc">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-label">En proceso</div>
+      <div class="kpi-value" id="k-proc">0</div>
+      <div class="kpi-sub">en ejecución</div>
+    </div>
+    <div class="kpi-card real">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-label">Realizados</div>
+      <div class="kpi-value" id="k-real">0</div>
+      <div class="kpi-sub">completados</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-row">
+    <!-- Donut estado -->
+    <div class="chart-card">
+      <h3><span></span>Estado general</h3>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110" id="donut-svg">
+          <circle cx="55" cy="55" r="42" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/>
+          <circle id="d-real" cx="55" cy="55" r="42" fill="none" stroke="#22c55e" stroke-width="14" stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 55 55)" style="transition:stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)"/>
+          <circle id="d-proc" cx="55" cy="55" r="42" fill="none" stroke="#3b82f6" stroke-width="14" stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 55 55)" style="transition:stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1) 0.1s"/>
+          <circle id="d-pend" cx="55" cy="55" r="42" fill="none" stroke="#f59e0b" stroke-width="14" stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 55 55)" style="transition:stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1) 0.2s"/>
+          <text x="55" y="50" text-anchor="middle" fill="#e8edf5" font-size="18" font-weight="600" font-family="DM Sans,sans-serif" id="donut-pct">0%</text>
+          <text x="55" y="65" text-anchor="middle" fill="#8b97ad" font-size="9" font-family="DM Sans,sans-serif">completo</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="donut-leg-item"><div class="donut-dot" style="background:var(--real)"></div><span class="donut-leg-label">Realizados</span><span class="donut-leg-val" id="dl-real" style="color:var(--real)">0</span></div>
+          <div class="donut-leg-item"><div class="donut-dot" style="background:var(--proc)"></div><span class="donut-leg-label">En proceso</span><span class="donut-leg-val" id="dl-proc" style="color:var(--accent2)">0</span></div>
+          <div class="donut-leg-item"><div class="donut-dot" style="background:var(--pend)"></div><span class="donut-leg-label">Pendientes</span><span class="donut-leg-val" id="dl-pend" style="color:var(--pend)">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tiendas -->
+    <div class="chart-card">
+      <h3><span style="background:var(--teal)"></span>Por tienda</h3>
+      <div class="hbar" id="chart-tiendas"></div>
+    </div>
+
+    <!-- Dependencia dots -->
+    <div class="chart-card">
+      <h3><span style="background:var(--violet)"></span>Por dependencia</h3>
+      <div class="dep-grid" id="chart-deps"></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Buscar por tienda, descripción, responsable...">
+    </div>
+    <select id="fil-tienda"><option value="">Todas las tiendas</option></select>
+    <select id="fil-estado"><option value="">Todos los estados</option><option>PENDIENTE</option><option>PROCESO</option><option>REALIZADO</option></select>
+    <select id="fil-prio"><option value="">Toda prioridad</option><option>ALTA</option><option>MEDIA</option><option>BAJA</option></select>
+    <select id="fil-smt"><option value="">SMT / SMR / Todos</option><option value="SMT">Solo SMT</option><option value="SMR">Solo SMR</option><option value="SIN">Sin orden</option></select>
+    <button class="btn-new" onclick="openModal()">+ Nueva tarea</button>
+    <div class="count-badge" id="count-badge">0 tareas</div>
+    <button class="btn-reset" onclick="resetData()" title="Restaurar datos originales">↺ Reset</button>
+  </div>
+  <div class="storage-bar">
+    <div class="storage-dot" id="storage-dot"></div>
+    <span id="storage-label">Cargando...</span>
+  </div>
+
+  <!-- TABLE -->
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tienda</th>
+          <th style="min-width:220px">Descripción</th>
+          <th>Dependencia</th>
+          <th>Prioridad</th>
+          <th>Estado</th>
+          <th>Avance</th>
+          <th>Equipo</th>
+          <th>Responsable</th>
+          <th>SMT/SMR</th>
+          <th>F. Incidencia</th>
+          <th>F. Cierre</th>
+          <th>Días Venc.</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbl"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Nueva tarea</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-row form-full"><label>Descripción</label><textarea id="f-desc" rows="2"></textarea></div>
+      <div class="form-row"><label>Tienda</label>
+        <select id="f-tienda">
+          <option>CIENAGA</option><option>MERCADO</option><option>TRANSPORTE</option>
+          <option>SANTA CRUZ</option><option>RODADERO</option><option>BAVARIA</option>
+          <option>CORPORATIVO</option><option>CEDI PLIS</option><option>MAGDALENA</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Dependencia</label>
+        <select id="f-dep">
+          <option>REFRIGERACION</option><option>ELECTRICO</option><option>ELECTROMECANICO</option>
+          <option>LOCATIVO</option><option>OBRA CIVIL</option><option>INFRAESTRUCTURA</option>
+          <option>HIDRAULICO</option><option>SOLDADOR</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Prioridad</label>
+        <select id="f-prio"><option>ALTA</option><option>MEDIA</option><option>BAJA</option></select>
+      </div>
+      <div class="form-row"><label>Estado</label>
+        <select id="f-estado"><option>PENDIENTE</option><option>PROCESO</option><option>REALIZADO</option></select>
+      </div>
+      <div class="form-row"><label>Avance (0 – 1)</label><input type="number" id="f-avance" min="0" max="1" step="0.05" value="0"></div>
+      <div class="form-row"><label>Equipo / Activo</label><input type="text" id="f-equipo"></div>
+      <div class="form-row"><label>Responsable</label><input type="text" id="f-resp"></div>
+      <div class="form-row"><label>SMT / SMR</label><input type="text" id="f-smt"></div>
+      <div class="form-row"><label>Fecha de incidencia</label><input type="date" id="f-fecha-inc"></div>
+      <div class="form-row"><label>Fecha de cierre</label><input type="date" id="f-fecha-cierre"></div>
+      <div class="form-row form-full"><label>Plan de acción</label><input type="text" id="f-plan"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveTask()">Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif">
+  <div class="notif-dot"></div>
+  <span id="notif-msg"></span>
+</div>
+
+<script>
+const DATA_RAW = [
+["CIENAGA","DEFINIR USO CAVA DE LACTEOS ( FUERA DE SERVICIO) NO TIENE PUERTA","REFRIGERACION","MEDIA","PENDIENTE",0,"CAVA LACTEOS","FALTA PUERTA PARA HABILITAR","LEONARDO ACOSTA","","",""],
+["MERCADO","CONTROL DEL RACK DE FRIO MECANICO","REFRIGERACION","MEDIA","REALIZADO",0.3,"RAKC FRIO","MONAR SMR- CREACION DE ITEMS","Juan Riatiga","","",""],
+["TRANSPORTE","AUTOMATIZACION RACK DE FRIO","REFRIGERACION","ALTA","REALIZADO",0.8,"RACK FRIO","PENDIENTE TRABAJO CON PERSONAL INTERNO","Juan Riatiga","","",""],
+["TRANSPORTE","FALTAN DOS COMPRESORES RACK FRIO BT 15 HP Y MT DE 22","REFRIGERACION","ALTA","PROCESO",0.7,"RACK FRIO","COTIZADO","Juan Riatiga","","",""],
+["SANTA CRUZ","TRAXOIL DAÑADO COMPRESOR #1 RACK","REFRIGERACION","ALTA","REALIZADO",1,"RACK FRIO","EN ESPERA DE OC","Juan Riatiga","SMR-47","",""],
+["RODADERO","REPARACION DE PISOS CUARTOS FRIOS/VENTA","INFRAESTRUCTURA","ALTA","PENDIENTE",0,"CAVA CARNES","COTIZACION A PROYECTOS Y ACABADOS","JUAN RIATIGA","","",""],
+["TRANSPORTE","MANTENIMIENTO ESTUFAS COCINA","LOCATIVO","ALTA","PROCESO",0,"ESTUFAS","WILIAN PERALES DEBE EJECUTAR ESTA SEMANA","Juan Riatiga","SMT-98","",""],
+["RODADERO","TRANSFERENCIA ELECTRICA DAÑADA","ELECTRICO","MEDIA","PENDIENTE",0,"PLANTA EMERGENCIA","REPARAR EL SISTEMA","JOSE GAMARRA","","",""],
+["RODADERO","HABILITAR CAVA DE CARNES CON DIVISION","REFRIGERACION","MEDIA","PENDIENTE",0,"CAVA CARNES","INSTALAR DIFUSORES Y DIVIDIR CAVA","Juan Riatiga","","",""],
+["RODADERO","AIRES ACONDICIONADOS FUERA DE SERVICIO","REFRIGERACION","MEDIA","PROCESO",0.8,"AIRES","DOS CONDENSADORAS FUERA DE SERVICIO","Juan Riatiga","","",""],
+["TRANSPORTE","AIRES ACONDCIONADOS","REFRIGERACION","MEDIA","PROCESO",0.8,"AIRES","COMPRAR 1 UNIDAD CONDENSADORA DE 10 HP","Juan Riatiga","","",""],
+["RODADERO","RACK DE FRIO COMPRESORES","REFRIGERACION","ALTA","PROCESO",1,"RACK FRIO","OCT-","Juan Riatiga","SMR-84","",""],
+["RODADERO","PRESURIZACIÓN DE SISTEMA RCI","HIDRAULICO","MEDIA","PENDIENTE",0,"RCI","PERSONAL INTERNO DEBE REALIZAR ESTE TRABAJO","JOSE GAMARRA","","",""],
+["RODADERO","CUARTO FRIO DE CONGELACION MAL ESTADO","LOCATIVO","ALTA","PENDIENTE",0,"CAVA CONGELACION","CONSTRUCCION DE CUARTO NUEVO","Juan Riatiga","","",""],
+["TRANSPORTE","ADECUACION CAVA DE CARNES","REFRIGERACION","MEDIA","PENDIENTE",0,"CAVA CARNES","COTIZAR PANELES","JUAN RIATIGA","","",""],
+["TRANSPORTE","ARREGLOS DE BAÑOS CLIENTES","LOCATIVO","MEDIA","PENDIENTE",0.8,"HIDROSANITARIO","PONER AGUA EN LOS BAÑOS","Juan Riatiga","","",""],
+["SANTA CRUZ","BALDOSAS AREA SAC","LOCATIVO","MEDIA","PROCESO",1,"SAC","COMPRAR Y REALIZAR","Juan Riatiga","","",""],
+["CIENAGA","ARREGLO DE BAÑOS CLIENTES","OBRA CIVIL","ALTA","PENDIENTE",0,"BAÑOS","COTIZAR CON TERCEROS","Juan Riatiga","","",""],
+["CIENAGA","ARREGLO TAPA TRAMPA DE GRASA EXTERNA","OBRA CIVIL","MEDIA","PENDIENTE",1,"TRAMPA GRASA","COTIZAR CON TERCEROS","Juan Riatiga","","",""],
+["MAGDALENA","GOTERAS EN TECHOS Y PLACAS","LOCATIVO","MEDIA","PENDIENTE",0,"TECHOS","REVISAR Y DEFINIR ESTADO","","","",""],
+["CIENAGA","ARREGLO DE ASCENSOR DE CARGA","ELECTROMECANICO","ALTA","PENDIENTE",1,"ASCENSOR","REVICION CONTRATISTA","Juan Riatiga","","",""],
+["SANTA CRUZ","BANCO DE CONDENSADORES SIN FUNCIONAR","ELECTRICO","ALTA","PENDIENTE",1,"BANCO","GESTIONAR REPARACION","Juan Riatiga","","",""],
+["SANTA CRUZ","INSTALAR CAMPANA COCINA","ELECTROMECANICO","ALTA","PENDIENTE",0,"CAMPANA","NUEVA SMT Y ACTULIZAR COTIZACION","Juan Riatiga","SMT-46","",""],
+["SANTA CRUZ","NEVERA DE BEBIDAS CON FUGA DE AGUA","REFRIGERACION","MEDIA","PENDIENTE",1,"NEVERA BEBIDAS","GESTIONAR GARANTIA INSTALACION","Juan Riatiga","","",""],
+["SANTA CRUZ","SIERRA DE CARNES FALLANDO","ELECTROMECANICO","ALTA","PENDIENTE",1,"SIERRA DE CARNES","EN ESPERA DE COTIZACION","Juan Riatiga","","",""],
+["TRANSPORTE","ALINEAR ILUMINACION Y SEGUIR CON CAMBIO LED","ELECTRICO","BAJA","PENDIENTE",0,"ILUMINACION","","Juan Riatiga","","",""],
+["TRANSPORTE","SIERRA DE CARNES FALLANDO","ELECTROMECANICO","ALTA","REALIZADO",1,"SIERRA DE CARNES","GESTION DE COMPRA ACTIVO","Juan Riatiga","SMT-96","",""],
+["TRANSPORTE","MOLINO DE CARNES DAÑADO","ELECTROMECANICO","ALTA","REALIZADO",1,"MOLINO DE CARNES","GESTION DE COMPRA ACTIVO","Juan Riatiga","SMT-97","",""],
+["RODADERO","CAMARA DE FERMENTACION DAÑADA","ELECTROMECANICO","ALTA","PENDIENTE",0,"CAMARA","EN ESPERA DE MOVIMIENTO DESDE SOCORRO","Juan Riatiga","","",""],
+["SANTA CRUZ","ASENSO DE CARGA CON FALLAS","ELECTROMECANICO","ALTA","PENDIENTE",0,"ASENSO","EN ESPERA DE OC","Juan Riatiga","SMT-45","",""],
+["BAVARIA","FILTRACIONES DE AGUA POR GOTERAS TECHO","LOCATIVO","ALTA","REALIZADO",1,"TECHOS","DUEÑO LOCAL REALIZO REPARACIONES","Juan Riatiga","","",""],
+["BAVARIA","AIRES ACONDCIONADOS FUERA DE SERVICIO","REFRIGERACION","ALTA","PROCESO",1,"AIRES","EN ESPERA DE OC","Juan Riatiga","30-31-32","",""],
+["BAVARIA","ILUMINACION PISO DE VENTA","ELECTRICO","MEDIA","REALIZADO",1,"ILUMINACION","REPERAR","Juan Riatiga","","",""],
+["CIENAGA","PISO CHUT DE BASURAS","LOCATIVO","MEDIA","PENDIENTE",0,"SHUT BASURAS","REPARAR PISO","Juan Riatiga","","",""],
+["MERCADO","TECHO PATIO CAIDO","LOCATIVO","ALTA","PROCESO",0.7,"OBRA CIVIL","OCT-185 EL LUNES EMPIEZA EJECUCION","Juan Riatiga","SMT-93","",""],
+["TRANSPORTE","EMPAQUES DE PUERTAS CUARTOS FRIOS","REFRIGERACION","MEDIA","PENDIENTE",0,"PUERTAS","COTIZAR Y GESTIONAR","Juan Riatiga","","",""],
+["TRANSPORTE","ARREGLO DE CIELO RAZO PARTE EXTERNA","LOCATIVO","MEDIA","PENDIENTE",0,"OBRA CIVIL","COTIZAR Y GESTIONAR","Juan Riatiga","","",""],
+["RODADERO","VIDRIO FACHADA QUEBRADO","INFRAESTRUCTURA","BAJA","PENDIENTE",0,"VIDRIOS","COTIZAR","Juan Riatiga","","",""],
+["RODADERO","AIRE ACONDICIONADO UPS","REFRIGERACION","ALTA","REALIZADO",1,"UPS","EN ESPERA DE OC","Juan Riatiga","SMT-83","",""],
+["RODADERO","INSTALACION REFLECTORES","INFRAESTRUCTURA","MEDIA","PROCESO",0.7,"ILUMINACION","EN PROCESO","JOSE GAMARRA","","",""],
+["RODADERO","INSTALACION DE UPS CAJAS ACOMETIDA","INFRAESTRUCTURA","ALTA","PENDIENTE",1,"UPS","EN ESPERA DE CLAVIJA","JOSE GAMARRA","SMT 82","",""],
+["SANTA CRUZ","REPARACION DE COMPRESOR RACK DE FRIO","REFRIGERACION","ALTA","REALIZADO",1,"COMPRESOR","EN ESPERA DE OC","Juan Riatiga","SMR-48","",""],
+["RODADERO","CAMBIO VALVULA EXPANSION NEVERA MANTEQUILLA","REFRIGERACION","ALTA","PROCESO",1,"NV MANTEQUILLAS","EN ESPERA DE OC","Juan Riatiga","SMR-82","",""],
+["CIENAGA","CONTROL NEVERA FRUVER","REFRIGERACION","MEDIA","PROCESO",1,"NV FRUVER","EN PROCESO COMPRAS","Juan Riatiga","SMR-30","",""],
+["CIENAGA","REFLECTORES ZONA RECIBO DAÑADOS","INFRAESTRUCTURA","MEDIA","REALIZADO",1,"ILUMINACION","EN PROCESO E INSTALACION","Juan Riatiga","SMT-56","",""],
+["CIENAGA","CAMBIO MOTOR VENTILADOR NV FRUVER","REFRIGERACION","MEDIA","REALIZADO",1,"NV FRUVER","REVISAR SI YA LLEGO","Juan Riatiga","SMR-32","",""],
+["TRANSPORTE","CORREAS CAMPANA DE COCINA","ELECTROMECANICO","ALTA","PENDIENTE",1,"CAMPANA","MONTAR SMT- CREAR ITEM ERP","Juan Riatiga","SMT-95","",""],
+["MERCADO","BALDOSAS LEVANTADAS AREA FRUVER","OBRA CIVIL","MEDIA","PENDIENTE",0,"PISO","SOLICITAR PEGACOR 1 BOLSA 25KG","Juan Riatiga","","",""],
+["RODADERO","ESTUCO E IMPERMEABILIZACION FACHADA","OBRA CIVIL","ALTA","PENDIENTE",0,"OBRA CIVIL","SOLICITAR MATERIAL","JOSE GAMARRA","SMT-89","",""],
+["CIENAGA","REPARACION PARED FRUVER","OBRA CIVIL","MEDIA","PENDIENTE",0,"OBRA CIVIL","PEDIR MATERIAL","JOSE GAMARRA","","",""],
+["CIENAGA","ILUMINACION PISO DE VENTA","ELECTRICO","MEDIA","PENDIENTE",0.2,"ILUMINACION","CAMBIAR LUCES","JOSE GAMARRA","SMT-60","",""],
+["CIENAGA","CERRADURA PUERTA CARNES","INFRAESTRUCTURA","MEDIA","REALIZADO",1,"PUERTAS","PEDIR CERRADURA","Juan Riatiga","SMT-58","",""],
+["CIENAGA","VIDRIO FACHADA QUEBRADO","INFRAESTRUCTURA","MEDIA","PENDIENTE",0,"PUERTAS","COTIZAR TERCERO","Juan Riatiga","","",""],
+["TRANSPORTE","ESTERA DE RECIBO DAÑADA","SOLDADOR","ALTA","PENDIENTE",1,"ESTERA","","JOSE GAMARRA","","",""],
+["RODADERO","MOJADORA PEQUEÑA FUERA DE SERVICIO","ELECTROMECANICO","MEDIA","PENDIENTE",0,"MOJADORA","COTIZADO MONTAR SOLICITUD","Juan Riatiga","","",""],
+["RODADERO","REPARACION DE ESCABILADEROS","ELECTROMECANICO","MEDIA","PENDIENTE",0,"ESCABILADEROS","DEFINIR PLAN DE ACCION","Juan Riatiga","","",""],
+["RODADERO","CONTROLADOR SALA DE PROCESO","REFRIGERACION","MEDIA","PENDIENTE",1,"CAVA PROCESO","SOLICITAR MT 512","Juan Riatiga","SMR-85","",""],
+["MERCADO","MONITOR DE VOLTAJE RACK DE FRIO","REFRIGERACION","ALTA","PENDIENTE",1,"RACK FRIO","SOLICITAR","Juan Riatiga","SMR-89","",""],
+["MERCADO","TRAMPA DE GRASA COCINA","LOCATIVO","MEDIA","PENDIENTE",0,"TRAMPA GRASA","CAMBIAR POR NUEVA","Juan Riatiga","","",""],
+["RODADERO","CILINDRADORNA FUERA DE SERVICIO","ELECTROMECANICO","ALTA","PENDIENTE",1,"CILINDRADORNA","SEGUIMIENTO SMT","Juan Riatiga","SMT-86","",""],
+["SANTA CRUZ","TURNERO DE CARNES NO HAY","LOCATIVO","BAJA","REALIZADO",1,"TURNERO","MONTAR SMT","Juan Riatiga","SMT-55","",""],
+["CORPORATIVO","HERRAMIENTAS VARIAS","INFRAESTRUCTURA","MEDIA","PENDIENTE",0,"MATTO","SEGUIMIENTO SMT","Juan Riatiga","SMT-1328","",""],
+["CORPORATIVO","MALETINES HERRAMIENTAS EQUIPO MTTO","INFRAESTRUCTURA","MEDIA","PENDIENTE",0,"MATTO","SEGUIMIENTO SMT","Juan Riatiga","SMT-1327","",""],
+["MERCADO","CAMBIO DE MANIFUL SUCCION","REFRIGERACION","ALTA","PENDIENTE",0,"RACK FRIO","COTIZAR","Juan Riatiga","SMR-91","",""],
+["RODADERO","TURNERO DE CARNES NO HAY","ELECTROMECANICO","MEDIA","PENDIENTE",1,"TURNERO","SOLICITAR","Juan Riatiga","SMT-87","",""],
+["SANTA CRUZ","ARREGLO DE ESTUFAS","ELECTROMECANICO","MEDIA","PENDIENTE",0,"ESTUFAS","MONTAR SMT","Juan Riatiga","SMT-56","",""],
+["MERCADO","REFRIGERANTE FUGA MANIFULL","REFRIGERACION","ALTA","REALIZADO",1,"RACK FRIO","EN ESPERA DE DESPACHO","Juan Riatiga","SMR-90","",""],
+["CIENAGA","INSTALACION DE MUEBLES POS","ELECTROMECANICO","ALTA","PENDIENTE",0,"POS","SOLICITAR MATERIAL","Juan Riatiga","SMT-61","",""],
+["CIENAGA","PINTURA ESCALERAS BODEGA","INFRAESTRUCTURA","MEDIA","PENDIENTE",0,"ESCALERA","SOLICITAR MATERIAL Y PROGRAMAR","Juan Riatiga","","",""],
+["SANTA CRUZ","AUTOCONTENIDA DAÑADA","REFRIGERACION","ALTA","PENDIENTE",0,"NV AUTOCONTENIDA","SOLICITAR REPUESTOS","Juan Riatiga","SMR-49","",""],
+["TRANSPORTE","CIELO RASO BAÑOS","INFRAESTRUCTURA","MEDIA","PENDIENTE",0,"OBRA CIVIL","MONTAR SMT LISTA MATERIALES","Juan Riatiga","SMT-99","",""],
+["CIENAGA","COMPRESOR RACK FUERA SERVICIO","REFRIGERACION","ALTA","PENDIENTE",0,"RACK FRIO","GESTIONAR GARANTIA","Juan Riatiga","SMR-34","",""],
+["TRANSPORTE","HORNO DE POLLOS DAÑADO","ELECTROMECANICO","MEDIA","PENDIENTE",0,"HORNO POLLOS","SEGUIMIENTO SMT","Juan Riatiga","","",""],
+["RODADERO","MATERIAL INSTALACION COMPRESORES","REFRIGERACION","ALTA","PENDIENTE",0.5,"RACK FRIO","GESTIONAR","Juan Riatiga","SMR-87","",""],
+["BAVARIA","SISTEMA DE SEGURIDAD TECHO","LOCATIVO","MEDIA","PENDIENTE",0,"LOCATIVO","ENVIAR PROPUESTA ECONOMICA","Juan Riatiga","","",""],
+["CORPORATIVO","DETECTOR DE FUGA","REFRIGERACION","ALTA","PENDIENTE",0,"RACK FRIO","COTIZAR","Juan Riatiga","","",""],
+["CIENAGA","PISO CAVA PROCESOS EN MAL ESTADO","LOCATIVO","MEDIA","PENDIENTE",0,"CAVA PROCESOS","CAMBIAR ENCHAPE","Juan Riatiga","","",""],
+["CIENAGA","COMPRESOR RACK FUERA SERVICIO","REFRIGERACION","ALTA","PENDIENTE",0,"RACK FRIO","GESTIONAR OC","Juan Riatiga","","",""],
+["RODADERO","ARREGLO DE PISO TRASTIENDA","LOCATIVO","MEDIA","PENDIENTE",0,"LOCATIVO","DEFINIR PLAN DE ACCION","Juan Riatiga","","",""],
+["CIENAGA","CAMBIO DE ACEITE RACK DE FRIO","REFRIGERACION","ALTA","PENDIENTE",0,"RACK FRIO","MONTAR SMR","Juan Riatiga","SMR-36","",""],
+["RODADERO","LUCES LINEAL LICORES","ELECTRICO","MEDIA","PENDIENTE",0,"LETRERO","REVISAR EQUIPO","JOSE GAMARRA","","",""],
+["MERCADO","ARREGLO PISO BODEGA","LOCATIVO","MEDIA","PENDIENTE",0,"LOCATIVO","PEDIR MATERIAL Y EJECUTAR","Juan Riatiga","SMT-94","",""],
+["CIENAGA","DEMOLICION PAREDES LOCALES","LOCATIVO","MEDIA","PENDIENTE",0,"LOCATIVO","DEFINIR PROVEEDOR","Juan Riatiga","","",""],
+["CIENAGA","ARREGLO DE CERRADURA PUERTA PRINCIPAL","LOCATIVO","MEDIA","PENDIENTE",0,"PUERTAS","GESTIONAR COMPRA","Juan Riatiga","SMT-66","",""],
+["RODADERO","ARREGLO DE CERRADURA PUERTA PRINCIPAL","LOCATIVO","MEDIA","PENDIENTE",0,"PUERTAS","GESTIONAR COMPRA","Juan Riatiga","SMT-91","",""],
+["SANTA CRUZ","ARREGLO DE CERRADURA PUERTA PRINCIPAL","LOCATIVO","MEDIA","PENDIENTE",0,"PUERTAS","GESTIONAR COMPRA","Juan Riatiga","SMT-58","",""],
+["TRANSPORTE","ARREGLO DE CERRADURA PUERTA PRINCIPAL","LOCATIVO","MEDIA","PENDIENTE",0,"PUERTAS","GESTIONAR COMPRA","Juan Riatiga","SMT-100","",""],
+["CORPORATIVO","SOLCITAR SONDA ELECTRICA","LOCATIVO","MEDIA","PENDIENTE",0,"","","","","",""],
+["CORPORATIVO","SOLCITAR TALADRO INALAMBRICA","LOCATIVO","MEDIA","PENDIENTE",0,"","","","","",""],
+["RODADERO","ADAPTADOR DE CONTROL RACK DE FRIO","REFRIGERACION","MEDIA","PENDIENTE",0,"RACK FRIO","GESTIONAR COMPRA","Juan Riatiga","SMR-92","",""],
+["SANTA CRUZ","ARREGLO DE POLIPASTO","ELECTROMECANICO","ALTA","PENDIENTE",0,"ASENSO","GESTIONAR OC","Juan Riatiga","SMT-59","",""],
+["CEDI PLIS","ARREGLOS VARIOS","ELECTROMECANICO","MEDIA","PENDIENTE",0,"VARIOS","GESTIONAR OC","Juan Riatiga","SMT-23","",""],
+["RODADERO","MANTENIMIENTO PLANTA EMERGENCIA","ELECTRICO","ALTA","PENDIENTE",0,"PLANTA EMERGENCIA","GESTIONAR","Juan Riatiga","","",""],
+["TRANSPORTE","MANTENIMIENTO PLANTA EMERGENCIA","ELECTRICO","ALTA","PENDIENTE",0,"PLANTA EMERGENCIA","GESTIONAR","Juan Riatiga","","",""],
+["BAVARIA","CERRAMIENTOS TECHO","LOCATIVO","ALTA","PENDIENTE",0,"LOCATIVO","GESTIONAR OC","Juan Riatiga","","",""],
+];
+
+// índices del array: 0=tienda,1=desc,2=dep,3=prio,4=estado,5=avance,6=equipo,7=plan,8=resp,9=smt,10=fecha_inc,11=fecha_cierre
+let data = DATA_RAW.map((r,i)=>({
+  id:i, tienda:r[0], desc:r[1], dep:r[2], prio:r[3], estado:r[4],
+  avance:r[5], equipo:r[6], plan:r[7], resp:r[8], smt:r[9],
+  fecha_inc:r[10]||'', fecha_cierre:r[11]||''
+}));
+let editId = null;
+
+// Date
+document.getElementById('hdr-fecha').textContent = new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+function norm(s){ return (s||'').toUpperCase().replace(/[ÓÁÉÍÚ]/g,c=>({Ó:'O',Á:'A',É:'E',Í:'I',Ú:'U'}[c]||c)).trim(); }
+
+function fmtDate(s) {
+  if(!s) return '—';
+  const [y,m,d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+// ── NOTIFICATION ──────────────────────────────────────────────────────────────
+function notify(msg) {
+  const el = document.getElementById('notif');
+  document.getElementById('notif-msg').textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────────────
+const TIENDA_COLORS = ['#3b82f6','#14b8a6','#8b5cf6','#f59e0b','#f43f5e','#22c55e','#ec4899','#06b6d4','#a78bfa'];
+const DEP_COLORS   = {'PENDIENTE':'#f59e0b','PROCESO':'#3b82f6','REALIZADO':'#22c55e'};
+
+function updateCharts() {
+  const tc = {}, dc = {};
+  data.forEach(d => {
+    tc[d.tienda] = tc[d.tienda] || {PENDIENTE:0,PROCESO:0,REALIZADO:0,total:0};
+    tc[d.tienda][norm(d.estado)]++;
+    tc[d.tienda].total++;
+    const dn = norm(d.dep);
+    dc[dn] = dc[dn] || {PENDIENTE:0,PROCESO:0,REALIZADO:0,total:0};
+    dc[dn][norm(d.estado)]++;
+    dc[dn].total++;
+  });
+
+  // Donut
+  const total = data.length;
+  const nReal = data.filter(d=>norm(d.estado)==='REALIZADO').length;
+  const nProc = data.filter(d=>norm(d.estado)==='PROCESO').length;
+  const nPend = data.filter(d=>norm(d.estado)==='PENDIENTE').length;
+  const C = 2*Math.PI*42;
+  const pReal = nReal/total, pProc = nProc/total, pPend = nPend/total;
+  document.getElementById('d-real').style.strokeDasharray = `${pReal*C} ${C}`;
+  document.getElementById('d-proc').style.strokeDasharray = `${pProc*C} ${C}`;
+  const procOff = pReal*C;
+  document.getElementById('d-proc').style.strokeDashoffset = `${-procOff}`;
+  document.getElementById('d-pend').style.strokeDasharray = `${pPend*C} ${C}`;
+  document.getElementById('d-pend').style.strokeDashoffset = `${-(procOff+pProc*C)}`;
+  document.getElementById('donut-pct').textContent = Math.round(nReal/total*100)+'%';
+  document.getElementById('dl-real').textContent = nReal;
+  document.getElementById('dl-proc').textContent = nProc;
+  document.getElementById('dl-pend').textContent = nPend;
+
+  // Tiendas bar
+  const tSorted = Object.entries(tc).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
+  const tMax = tSorted[0]?tSorted[0][1].total:1;
+  document.getElementById('chart-tiendas').innerHTML = tSorted.map(([t,s],i)=>`
+    <div class="hbar-item">
+      <span class="hbar-label" title="${t}">${t.length>9?t.slice(0,8)+'…':t}</span>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${Math.round(s.total/tMax*100)}%;background:${TIENDA_COLORS[i%TIENDA_COLORS.length]}"></div></div>
+      <span class="hbar-count">${s.total}</span>
+    </div>`).join('');
+
+  // Deps dots
+  const dSorted = Object.entries(dc).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
+  document.getElementById('chart-deps').innerHTML = dSorted.map(([dep, st])=>{
+    const dots = [
+      ...Array(st.PENDIENTE).fill('PENDIENTE'),
+      ...Array(st.PROCESO).fill('PROCESO'),
+      ...Array(st.REALIZADO).fill('REALIZADO'),
+    ].map(s=>`<div class="dep-dot" style="background:${DEP_COLORS[s]};opacity:0.85" title="${s}"></div>`).join('');
+    const label = dep.length > 14 ? dep.slice(0,13)+'…' : dep;
+    return `<div class="dep-row"><span class="dep-name" title="${dep}">${label}</span><div class="dep-dots">${dots}</div><span class="dep-total">${st.total}</span></div>`;
+  }).join('');
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function populateFilters() {
+  const sel = document.getElementById('fil-tienda');
+  const cur = sel.value;
+  const tiendas = [...new Set(data.map(d=>d.tienda))].sort();
+  sel.innerHTML = '<option value="">Todas las tiendas</option>' + tiendas.map(t=>`<option${t===cur?' selected':''}>${t}</option>`).join('');
+}
+
+function getFiltered() {
+  const q  = document.getElementById('search').value.toLowerCase();
+  const ft = document.getElementById('fil-tienda').value;
+  const fe = document.getElementById('fil-estado').value;
+  const fp = document.getElementById('fil-prio').value;
+  const fs = document.getElementById('fil-smt').value;
+  return data.filter(d => {
+    if(q && !`${d.tienda} ${d.desc} ${d.resp} ${d.plan} ${d.smt}`.toLowerCase().includes(q)) return false;
+    if(ft && d.tienda !== ft) return false;
+    if(fe && norm(d.estado) !== norm(fe)) return false;
+    if(fp && norm(d.prio) !== norm(fp)) return false;
+    if(fs) {
+      const s = (d.smt||'').toUpperCase();
+      if(fs==='SMT' && !s.includes('SMT')) return false;
+      if(fs==='SMR' && !s.includes('SMR')) return false;
+      if(fs==='SIN' && s.trim()!=='') return false;
+    }
+    return true;
+  });
+}
+
+function diasVencidos(fecha_inc, estado) {
+  if(norm(estado)==='REALIZADO') return {dias:0, cls:'done', label:'—'};
+  if(!fecha_inc) return {dias:null, cls:'done', label:'—'};
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const inc  = new Date(fecha_inc); inc.setHours(0,0,0,0);
+  const d    = Math.floor((hoy - inc)/(1000*60*60*24));
+  if(d < 0)   return {dias:d,   cls:'ok',   label:`${Math.abs(d)}d restantes`};
+  if(d <= 30) return {dias:d,   cls:'ok',   label:`${d}d`};
+  if(d <= 90) return {dias:d,   cls:'warn', label:`${d}d`};
+  return               {dias:d, cls:'over', label:`${d}d`};
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function pillEst(e) {
+  const n = norm(e);
+  const map = {PENDIENTE:'pend',PROCESO:'proc',REALIZADO:'real'};
+  const labels = {PENDIENTE:'Pendiente',PROCESO:'En proceso',REALIZADO:'Realizado'};
+  const cls = map[n]||'pend';
+  return `<span class="pill pill-${cls}"><span class="pill-dot"></span>${labels[n]||e}</span>`;
+}
+function pillPrio(p) {
+  const n = norm(p);
+  const map = {ALTA:'alta',MEDIA:'media',BAJA:'baja'};
+  return `<span class="pill pill-${map[n]||'media'}">${p}</span>`;
+}
+function progBar(av) {
+  const pct = Math.round(av*100);
+  const cls = pct >= 100 ? 'c100' : pct >= 50 ? 'c50' : 'c0';
+  return `<div class="prog-wrap"><div class="prog-track"><div class="prog-fill ${cls}" style="width:${pct}%"></div></div><span class="prog-pct">${pct}%</span></div>`;
+}
+
+function render() {
+  const filtered = getFiltered();
+  // KPIs
+  document.getElementById('k-total').textContent = filtered.length;
+  document.getElementById('k-pend').textContent  = filtered.filter(d=>norm(d.estado)==='PENDIENTE').length;
+  document.getElementById('k-proc').textContent  = filtered.filter(d=>norm(d.estado)==='PROCESO').length;
+  document.getElementById('k-real').textContent  = filtered.filter(d=>norm(d.estado)==='REALIZADO').length;
+  document.getElementById('count-badge').textContent = `${filtered.length} tareas`;
+
+  const tbody = document.getElementById('tbl');
+  if(!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="13" class="empty">No se encontraron tareas con los filtros seleccionados.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(d => {
+    const isReal = norm(d.estado)==='REALIZADO';
+    const dv     = diasVencidos(d.fecha_inc, d.estado);
+    const smtVal = d.smt||'';
+    const smtCls = smtVal.toUpperCase().includes('SMT') ? 'smt' : smtVal.toUpperCase().includes('SMR') ? 'smr' : '';
+    const smtHtml = smtVal
+      ? `<span class="smt-pill ${smtCls}">${smtVal}</span>`
+      : '—';
+    return `<tr>
+      <td class="td-tienda">${d.tienda}</td>
+      <td class="td-desc">${d.desc}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap">${d.dep}</td>
+      <td>${pillPrio(d.prio)}</td>
+      <td>${pillEst(d.estado)}</td>
+      <td>${progBar(d.avance)}</td>
+      <td style="font-size:11px;color:var(--text2)">${d.equipo||'—'}</td>
+      <td style="font-size:11px;white-space:nowrap">${d.resp||'—'}</td>
+      <td class="td-mono">${smtHtml}</td>
+      <td class="td-mono">${fmtDate(d.fecha_inc)}</td>
+      <td class="td-mono">${fmtDate(d.fecha_cierre)}</td>
+      <td><span class="dias-badge ${dv.cls}">${dv.label}</span></td>
+      <td><div class="actions">
+        ${!isReal?`<button class="act-btn done" onclick="completeTask(${d.id})" title="Marcar como realizado">✓</button>`:''}
+        <button class="act-btn" onclick="editTask(${d.id})" title="Editar">✏</button>
+        <button class="act-btn del" onclick="deleteTask(${d.id})" title="Eliminar">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function completeTask(id) {
+  const t = data.find(d=>d.id===id);
+  if(t){ t.estado='REALIZADO'; t.avance=1; render(); updateCharts(); notify('Tarea marcada como REALIZADO ✓'); }
+}
+function deleteTask(id) {
+  if(confirm('¿Eliminar esta tarea?')){ data=data.filter(d=>d.id!==id); render(); updateCharts(); populateFilters(); notify('Tarea eliminada'); }
+}
+function editTask(id) {
+  const t = data.find(d=>String(d.id)===String(id)); if(!t) return;
+  editId = id;
+  document.getElementById('modal-title').textContent = 'Editar tarea';
+  document.getElementById('f-desc').value        = t.desc;
+  document.getElementById('f-tienda').value      = t.tienda;
+  document.getElementById('f-dep').value         = t.dep;
+  document.getElementById('f-prio').value        = t.prio;
+  document.getElementById('f-estado').value      = t.estado;
+  document.getElementById('f-avance').value      = t.avance;
+  document.getElementById('f-equipo').value      = t.equipo||'';
+  document.getElementById('f-resp').value        = t.resp||'';
+  document.getElementById('f-smt').value         = t.smt||'';
+  document.getElementById('f-plan').value        = t.plan||'';
+  document.getElementById('f-fecha-inc').value   = t.fecha_inc||'';
+  document.getElementById('f-fecha-cierre').value = t.fecha_cierre||'';
+  document.getElementById('overlay').classList.add('open');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal() {
+  editId = null;
+  document.getElementById('modal-title').textContent = 'Nueva tarea';
+  ['f-desc','f-equipo','f-resp','f-smt','f-plan','f-fecha-inc','f-fecha-cierre'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-avance').value = 0;
+  document.getElementById('f-tienda').selectedIndex = 0;
+  document.getElementById('f-dep').selectedIndex = 0;
+  document.getElementById('f-prio').selectedIndex = 0;
+  document.getElementById('f-estado').selectedIndex = 0;
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+
+function saveTask() {
+  const avance = parseFloat(document.getElementById('f-avance').value)||0;
+  let estado = document.getElementById('f-estado').value;
+  if(avance >= 1 && norm(estado) !== 'REALIZADO') estado = 'REALIZADO';
+  const task = {
+    tienda:      document.getElementById('f-tienda').value,
+    desc:        document.getElementById('f-desc').value,
+    dep:         document.getElementById('f-dep').value,
+    prio:        document.getElementById('f-prio').value,
+    estado, avance,
+    equipo:      document.getElementById('f-equipo').value,
+    plan:        document.getElementById('f-plan').value,
+    resp:        document.getElementById('f-resp').value,
+    smt:         document.getElementById('f-smt').value,
+    fecha_inc:   document.getElementById('f-fecha-inc').value,
+    fecha_cierre:document.getElementById('f-fecha-cierre').value,
+  };
+  if(editId !== null) {
+    const idx = data.findIndex(d=>d.id===editId);
+    if(idx > -1) data[idx] = {...task, id:editId};
+    notify('Tarea actualizada ✓');
+  } else {
+    task.id = Date.now(); data.push(task);
+    notify('Nueva tarea agregada ✓');
+  }
+  closeModal(); render(); updateCharts(); populateFilters();
+}
+
+// ── GOOGLE SHEETS API ─────────────────────────────────────────────────────────
+const API_URL = 'https://script.google.com/macros/s/AKfycbwBu6RI6POYyFJgrlXjnw271B_6KtdCi0C09guqP4tR4Lg56PBqAX1UjoEaW9_i5LJC/exec';
+
+function updateStorageLabel(msg, color) {
+  const dot = document.getElementById('storage-dot');
+  const lbl = document.getElementById('storage-label');
+  dot.style.background = color || 'var(--real)';
+  lbl.textContent = msg || '';
+}
+
+function jsonpGet() {
+  return new Promise((resolve, reject) => {
+    const cbName = '_gcb_' + Date.now();
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      delete window[cbName]; script.remove();
+      reject(new Error('timeout'));
+    }, 12000);
+    window[cbName] = function(json) {
+      clearTimeout(timeout); delete window[cbName]; script.remove();
+      resolve(json);
+    };
+    script.src = API_URL + '?callback=' + cbName;
+    script.onerror = () => { clearTimeout(timeout); delete window[cbName]; script.remove(); reject(new Error('error')); };
+    document.head.appendChild(script);
+  });
+}
+
+function sheetRecord(t) {
+  return {
+    ID:String(t.id), TIENDA:t.tienda, DESCRIPCION:t.desc, DEPENDENCIA:t.dep,
+    PRIORIDAD:t.prio, ESTADO:t.estado, AVANCE:t.avance, EQUIPO:t.equipo,
+    PLAN:t.plan, RESPONSABLE:t.resp, SMT:t.smt,
+    FECHA_INC:t.fecha_inc||'', FECHA_CIERRE:t.fecha_cierre||''
+  };
+}
+
+function mapRow(row) {
+  return {
+    id:String(row.ID||Date.now()), tienda:row.TIENDA||'', desc:row.DESCRIPCION||'',
+    dep:row.DEPENDENCIA||'', prio:row.PRIORIDAD||'MEDIA', estado:row.ESTADO||'PENDIENTE',
+    avance:parseFloat(row.AVANCE)||0, equipo:row.EQUIPO||'', plan:row.PLAN||'',
+    resp:row.RESPONSABLE||'', smt:row.SMT||'',
+    fecha_inc:row.FECHA_INC||'', fecha_cierre:row.FECHA_CIERRE||''
+  };
+}
+
+async function apiPost(payload) {
+  try {
+    await fetch(API_URL, { method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    const now = new Date().toLocaleString('es-CO',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+    updateStorageLabel(`☁ Google Sheets · ${data.length} tareas · guardado ${now}`, 'var(--real)');
+  } catch(e) { updateStorageLabel('⚠ No se pudo sincronizar con Sheets','var(--amber)'); }
+}
+
+async function loadFromSheets() {
+  updateStorageLabel('Conectando con Google Sheets...', 'var(--amber)');
+  try {
+    const json = await jsonpGet();
+    if (json.status === 'ok' && Array.isArray(json.data) && json.data.length > 0) {
+      data = json.data.map(mapRow);
+      const now = new Date().toLocaleString('es-CO',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+      updateStorageLabel(`☁ Google Sheets · ${data.length} tareas · sincronizado ${now}`, 'var(--real)');
+    } else {
+      await uploadDefaultData();
+    }
+  } catch(e) {
+    console.warn('Sheets no disponible, usando datos locales:', e);
+    updateStorageLabel('⚠ Sin conexión con Sheets — datos locales', 'var(--amber)');
+    data = DATA_RAW.map((r,i)=>({
+      id:String(i), tienda:r[0], desc:r[1], dep:r[2], prio:r[3], estado:r[4],
+      avance:r[5], equipo:r[6], plan:r[7], resp:r[8], smt:r[9],
+      fecha_inc:r[10]||'', fecha_cierre:r[11]||''
+    }));
+  }
+  populateFilters(); updateCharts(); render();
+}
+
+async function uploadDefaultData() {
+  updateStorageLabel('Primera vez: subiendo datos al Sheet...', 'var(--amber)');
+  data = DATA_RAW.map((r,i)=>({
+    id:String(i), tienda:r[0], desc:r[1], dep:r[2], prio:r[3], estado:r[4],
+    avance:r[5], equipo:r[6], plan:r[7], resp:r[8], smt:r[9],
+    fecha_inc:r[10]||'', fecha_cierre:r[11]||''
+  }));
+  for (const t of data) {
+    try { await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'insert',record:sheetRecord(t)})}); } catch(e) {}
+  }
+  const now = new Date().toLocaleString('es-CO',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+  updateStorageLabel(`☁ Datos subidos al Sheet · ${data.length} tareas · ${now}`, 'var(--real)');
+}
+
+function resetData() {
+  if (!confirm('¿Recargar datos desde Google Sheets?')) return;
+  loadFromSheets();
+}
+
+// Patch actions → sincronizan con Sheets
+const _completeTask = completeTask;
+completeTask = function(id) {
+  const t = data.find(d=>String(d.id)===String(id));
+  if(t){ t.estado='REALIZADO'; t.avance=1; apiPost({action:'update',record:sheetRecord(t)}); render(); updateCharts(); notify('Tarea marcada como REALIZADO ✓'); }
+};
+
+const _deleteTask = deleteTask;
+deleteTask = function(id) {
+  if(confirm('¿Eliminar esta tarea?')){
+    data=data.filter(d=>String(d.id)!==String(id));
+    apiPost({action:'delete',id:String(id)});
+    render(); updateCharts(); populateFilters(); notify('Tarea eliminada');
+  }
+};
+
+const _saveTask = saveTask;
+saveTask = function() {
+  const avance = parseFloat(document.getElementById('f-avance').value)||0;
+  let estado = document.getElementById('f-estado').value;
+  if(avance >= 1 && norm(estado) !== 'REALIZADO') estado = 'REALIZADO';
+  const task = {
+    tienda:      document.getElementById('f-tienda').value,
+    desc:        document.getElementById('f-desc').value,
+    dep:         document.getElementById('f-dep').value,
+    prio:        document.getElementById('f-prio').value,
+    estado, avance,
+    equipo:      document.getElementById('f-equipo').value,
+    plan:        document.getElementById('f-plan').value,
+    resp:        document.getElementById('f-resp').value,
+    smt:         document.getElementById('f-smt').value,
+    fecha_inc:   document.getElementById('f-fecha-inc').value,
+    fecha_cierre:document.getElementById('f-fecha-cierre').value,
+  };
+  if(editId !== null) {
+    const idx = data.findIndex(d=>String(d.id)===String(editId));
+    if(idx > -1){ task.id = editId; data[idx] = task; }
+    apiPost({action:'update',record:sheetRecord(task)}); notify('Tarea actualizada ✓');
+  } else {
+    task.id = String(Date.now()); data.push(task);
+    apiPost({action:'insert',record:sheetRecord(task)}); notify('Nueva tarea agregada ✓');
+  }
+  closeModal(); render(); updateCharts(); populateFilters();
+};
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+['search','fil-tienda','fil-estado','fil-prio','fil-smt'].forEach(id => document.getElementById(id).addEventListener('input', render));
+
+loadFromSheets();
+</script>
+</body>
+</html>
